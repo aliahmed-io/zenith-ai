@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Generative Financial Literacy & Sandbox Platform 🚀
 
-## Getting Started
+Welcome to the ultimate Apple-level minimalist financial learning platform. This project merges the beautiful UI of `zenith` with a sophisticated AI Mentor and a robust Paper Trading Sandbox. 
 
-First, run the development server:
+## 🏗 System Architecture
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This platform is built on three core pillars:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 1. Main UI Shell
+- **Framework:** Next.js 15 (App Router, Server Components)
+- **Database:** MongoDB & Mongoose
+- **Authentication:** `better-auth`
+- **Styling:** Tailwind CSS + `shadcn/ui`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 2. AI Mentor Pillar
+- **Logic:** Powered by Vercel AI SDK and Groq.
+- **Features:** A Generative UI chat interface where the AI agent has direct "tools" to query live financial data and render interactive React components (like charts and sentiment meters) inside the chat stream.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Sandbox Pillar (Paper Trading)
+- **Virtual Balance:** Every user is initialized with a `$100,000` virtual balance via `better-auth` session injection.
+- **Engine:** Real-time Buy/Sell execution logic that tracks portfolios and transactions, calculating average cost basis and P&L natively.
+- **Visualization:** Integration of a React Flow DAG (Directed Acyclic Graph) canvas to visualize the "Thought Process" and technical reasoning behind AI trade recommendations.
 
-## Learn More
+## ⚙️ Getting Started
 
-To learn more about Next.js, take a look at the following resources:
+### Prerequisites
+- Node.js >= 18
+- MongoDB instance (Atlas or local)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Clone & Install**
+   ```bash
+   npm install --legacy-peer-deps
+   ```
 
-## Deploy on Vercel
+2. **Environment Variables**
+   Copy `.env.example` to `.env.local` and fill in your keys:
+   ```bash
+   cp .env.example .env.local
+   ```
+   *Note: You will need a `MONGODB_URI`, `BETTER_AUTH_SECRET`, and API keys for Groq and Finnhub.*
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. **Database Migration**
+   If you have existing users, run the migration to inject the `$100,000` virtual balance:
+   ```bash
+   npx tsx --env-file=.env.local scripts/migrate-virtual-balance.ts
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. **Run the Development Server**
+   ```bash
+   npm run dev
+   ```
+   Navigate to `http://localhost:3000` to start exploring!
+
+## 🧪 Testing & Validation
+The core logic for trade execution is abstracted into server actions (`lib/actions/trading.actions.ts`). To test the Sandbox API directly:
+- **Execute Trade:** `POST /api/trading/execute`
+- **Fetch Portfolio:** `GET /api/trading/portfolio`
+- **Trading History:** `GET /api/trading/history?symbol=AAPL`
