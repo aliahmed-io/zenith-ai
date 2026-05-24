@@ -17,16 +17,7 @@ if(!cached) {
 
 export const connectToDatabase = async () => {
     if(!MONGODB_URI) {
-        console.warn("MONGODB_URI is missing. Mocking database connection for build.");
-        const mockDb = {
-            collection: () => ({
-                createIndex: async () => {},
-                findOne: async () => null,
-                find: () => ({ toArray: async () => [] }),
-                insertOne: async () => ({ insertedId: "mock" }),
-            })
-        };
-        return { connection: { db: mockDb } } as any;
+        throw new Error("MONGODB_URI is not defined in environment variables. A real database connection is required for build and runtime.");
     }
 
     if(cached.conn) return cached.conn;

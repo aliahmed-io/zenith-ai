@@ -1,25 +1,30 @@
-# Insights & Strategic Direction: Zenith
+# Zenith Project Insights
 
 ## Current Project Strengths
-1. **Exceptional Architecture:** The transition to Next.js 15 Turbopack and the integration of `better-auth` combined with LangGraph agents provide a true enterprise-grade foundation. It is highly scalable and completely type-safe.
-2. **Premium UI/UX:** The "Apple-tier" minimalist design, dark mode, Geist typography, and micro-animations set this platform apart from standard open-source finance apps. It commands trust.
-3. **Agentic AI Capabilities:** The true differentiator is the LangGraph-based Mentor. Instead of a standard LLM chat, Zenith's agents have access to real-time tools (Finnhub API) and user portfolio context, allowing them to provide actionable, math-backed financial literacy mentoring.
-4. **Virtual Sandbox:** Starting users with a $100,000 virtual balance completely removes the barrier to entry for beginners, facilitating risk-free financial education.
+1. **Modern Foundation:** The switch to Next.js 15, Turbopack, and Tailwind creates an incredibly fast developer experience and a highly performant user interface.
+2. **Robust Authentication:** Migrating to **Better Auth** solved many of the edge cases and complexities found in older NextAuth setups, providing a much cleaner database integration for session management.
+3. **Event-Driven AI Automation:** Using Inngest for the background tasks (welcome emails, daily news) is a massive strength. It prevents the Vercel/Next.js serverless functions from timing out when waiting for Gemini LLM responses.
+4. **Agentic UI:** The AI Stock Advisor utilizing LangGraph is state-of-the-art. Exposing the internal "agent steps" in the UI builds immense user trust.
 
 ## Current Weaknesses
-1. **Over-reliance on Mock Data in UI:** Several prominent sections (e.g., Sentiment Analysis, Multimedia/News, Market Heatmap, and Portfolio Historical Analytics) currently rely on hardcoded arrays. In a dynamic financial application, static data rapidly degrades user trust.
-2. **Incomplete Real-time Feed:** While the AI has access to real-time data, the dashboard UI lacks continuous WebSocket updates for ticker prices, meaning users must manually refresh or rely solely on AI queries for the latest minute-by-minute ticks.
-3. **Lingering Brand Artifacts:** Due to the consolidation of multiple codebases (Signalist, Optionxi, Vibe-Trade, etc.), there are fragmented brand references scattered across the codebase that break immersion.
+1. **Dead Code Accumulation:** The merger of `Signalist`, `AI-Finance`, and other side projects resulted in a massive amount of dead code. Specifically, the entire `components/trading/` directory is full of unused components, old headers, and legacy crypto logic.
+2. **Missing E2E Tests:** Currently, there is no Playwright or Cypress testing to ensure the critical flows (Login -> View Dashboard -> Ask AI Advisor) remain unbroken during refactors.
+3. **Database Mocking in Build:** The project build currently mocks the MongoDB connection if the URI isn't provided, which can lead to false confidence if the live DB schema changes.
 
-## Strategic Direction
-The goal is to transition Zenith from a "prototype/sandbox" into a "Live Intelligent Platform."
-1. **Data Authenticity:** The absolute highest priority is hooking up all frontend components to live APIs (e.g., Finnhub). The application must breathe real market data.
-2. **Brand Unification:** A comprehensive sweep must establish "Zenith" by "Ali Ahmed" as the sole identity of the platform.
-3. **Advanced AI Observability:** Exposing the AI's "thought process" (the LangGraph DAG traversal) in the UI so users can see *how* the Mentor arrived at its conclusion. This builds massive trust in the AI's financial advice.
+## Future Direction & How to Improve
 
-## Actionable Fixes & Improvements
-- **Fix:** Replace the hardcoded `MarketHeatmap.tsx` array with a dynamic fetch from Finnhub's quote API, or a custom backend aggregator.
-- **Fix:** Replace the mock Reddit posts in `SentimentSection.tsx` with live Finnhub Social Sentiment or Market News data.
-- **Fix:** Perform a global regex search to replace all legacy brand names with "Zenith".
-- **Improvement:** Implement WebSocket connections (or polling via SWR/React Query) for the user's active portfolio holdings to make the dashboard tick live.
-- **Improvement:** Dynamically generate the 30-day `performanceData` in the Portfolio Analytics by calculating historical snapshots of the user's transaction history against historical asset prices.
+### 1. Finalize the Purge
+- **Action:** Systematically audit the `components/` directory. Delete anything related to Chatwoot, n8n, and old dashboard variations that are no longer actively imported by `app/(root)`.
+- **Why:** This will reduce the repository size, speed up linting, and prevent future developers from accidentally importing legacy UI components that break the minimalist Zenith theme.
+
+### 2. Enhance the AI Advisor's Tooling
+- **Action:** Give the LangGraph agents inside `/stockadvisor` actual tools (using Vercel AI SDK's `tool` calling) to query the database. For example, allow the AI to look up the user's current virtual portfolio balance or watchlist.
+- **Why:** This turns the AI from a generic financial bot into a deeply personalized wealth manager.
+
+### 3. Implement Virtual Trading Engine
+- **Action:** You currently have database models for `Transaction` and `Portfolio`. Hook these up to the UI so users can execute paper trades directly from the `/stocks/[symbol]` page using real-time Finnhub prices.
+- **Why:** Paper trading is the stickiest feature a stock platform can have. Users will return daily to check their portfolio performance.
+
+### 4. Robust Notification System
+- **Action:** Expand the Inngest background workers to track stock prices. If a stock in a user's watchlist drops or rises by >5%, send a personalized NodeMailer alert.
+- **Why:** Increases Daily Active Users (DAU) by actively pulling them back into the platform.

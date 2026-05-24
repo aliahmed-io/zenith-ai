@@ -372,7 +372,7 @@ export function CommandPalette() {
                     )
                   }
                 >
-                  <Star className="mr-2 h-4 w-4 text-yellow-500" />
+                  <Star className="mr-2 h-4 w-4 text-primary" />
                   <span>{watchlist.name}</span>
                   <span className="ml-2 text-xs text-muted-foreground">
                     {watchlist.assets.length} assets
@@ -421,7 +421,7 @@ export function CommandPalette() {
                 <CommandItem
                   onSelect={() => handleSelect(() => router.push("/watchlist"), { id: "watchlist", label: "Watchlist", type: "page", path: "/watchlist" })}
                 >
-                  <Star className="mr-2 h-4 w-4 text-yellow-500" />
+                  <Star className="mr-2 h-4 w-4 text-primary" />
                   <span>Watchlist</span>
                 </CommandItem>
               </>
@@ -442,7 +442,7 @@ export function CommandPalette() {
               <CommandItem
                 onSelect={() => handleSelect(() => router.push("/watchlist"))}
               >
-                <Plus className="mr-2 h-4 w-4 text-yellow-500" />
+                <Plus className="mr-2 h-4 w-4 text-primary" />
                 <span>Create Watchlist</span>
               </CommandItem>
               <CommandItem onSelect={() => handleSelect(handleSignOut)}>
