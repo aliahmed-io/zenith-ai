@@ -19,8 +19,8 @@ This platform is built on three core pillars:
 - **Data Integration:** Finnhub (Raw Market Data/News) & TradingView (Interactive Charting Widgets)
 
 ### 2. AI Automation & Agents
-- **AI Stock Advisor:** Powered by Vercel AI SDK, Groq, and LangGraph. Features a multi-agent system (Supervisor, Technical Analyst, Sentiment Analyst) that dynamically streams thoughts and responses into a bespoke generative chat interface (`/stockadvisor`).
-- **Background Intelligence:** Powered by Inngest and Google Gemini. The platform automatically generates hyper-personalized AI welcome emails upon sign-up and scheduled daily AI news summaries tailored specifically to user watchlists.
+- **AI Stock Advisor**: Powered by Vercel AI SDK, Google Gemini (`gemini-3.1-flash-lite` with `gemini-3.5-flash` fallback), and LangGraph. Features a multi-agent system (Supervisor, Technical Analyst, Sentiment Analyst) that dynamically streams thoughts and responses into a bespoke generative chat interface (`/stockadvisor`).
+- **Background Intelligence**: Powered by Inngest and Google Gemini. The platform automatically generates hyper-personalized AI welcome emails upon sign-up and scheduled daily AI news summaries tailored specifically to user watchlists.
 
 ### 3. Sandbox Pillar (Paper Trading)
 - **Virtual Balance:** Every user is initialized with a `$100,000` virtual balance via `better-auth` session injection.
@@ -47,9 +47,8 @@ This platform is built on three core pillars:
    *Required Keys:*
    - `MONGODB_URI`: Database connection
    - `BETTER_AUTH_SECRET` & `BETTER_AUTH_URL`: Authentication
-   - `NEXT_PUBLIC_GROQ_API_KEY`: LangGraph AI Advisor
-   - `GEMINI_API_KEY`: Inngest Background AI Tasks
-   - `NEXT_PUBLIC_FINNHUB_API_KEY`: Real-time Market Data
+   - `GEMINI_API_KEY`: Google Gemini API Key powering LangGraph AI Advisor and Inngest Background Tasks
+   - `NEXT_PUBLIC_FINNHUB_API_KEY` & `FINNHUB_API_KEY`: Real-time Market Data
    - `NODEMAILER_EMAIL` & `NODEMAILER_PASSWORD`: Transactional Emails
 
 3. **Run the Development Server**

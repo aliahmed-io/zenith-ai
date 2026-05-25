@@ -1,30 +1,45 @@
-# Zenith Project Insights
+# Zenith Project Insights & Future Roadmap
 
-## Current Project Strengths
-1. **Modern Foundation:** The switch to Next.js 15, Turbopack, and Tailwind creates an incredibly fast developer experience and a highly performant user interface.
-2. **Robust Authentication:** Migrating to **Better Auth** solved many of the edge cases and complexities found in older NextAuth setups, providing a much cleaner database integration for session management.
-3. **Event-Driven AI Automation:** Using Inngest for the background tasks (welcome emails, daily news) is a massive strength. It prevents the Vercel/Next.js serverless functions from timing out when waiting for Gemini LLM responses.
-4. **Agentic UI:** The AI Stock Advisor utilizing LangGraph is state-of-the-art. Exposing the internal "agent steps" in the UI builds immense user trust.
+This document outlines the architectural strengths, weaknesses, and future roadmaps for the Zenith Platform, serving as our continuous strategic plan.
 
-## Current Weaknesses
-1. **Dead Code Accumulation:** The merger of `Signalist`, `AI-Finance`, and other side projects resulted in a massive amount of dead code. Specifically, the entire `components/trading/` directory is full of unused components, old headers, and legacy crypto logic.
-2. **Missing E2E Tests:** Currently, there is no Playwright or Cypress testing to ensure the critical flows (Login -> View Dashboard -> Ask AI Advisor) remain unbroken during refactors.
-3. **Database Mocking in Build:** The project build currently mocks the MongoDB connection if the URI isn't provided, which can lead to false confidence if the live DB schema changes.
+---
 
-## Future Direction & How to Improve
+## 1. Current Project Strengths
 
-### 1. Finalize the Purge
-- **Action:** Systematically audit the `components/` directory. Delete anything related to Chatwoot, n8n, and old dashboard variations that are no longer actively imported by `app/(root)`.
-- **Why:** This will reduce the repository size, speed up linting, and prevent future developers from accidentally importing legacy UI components that break the minimalist Zenith theme.
+1. **Modern App Router Foundation**: Switch to Next.js 15, Turbopack, and Tailwind CSS v4 provides an incredibly fast developer experience, optimal chunk sizes, and lightning-fast client loading times.
+2. **Robust Simulated Trading Engine**: We bridged the paper-trading ledger backend with the UI! The new bento-grid dashboard visualizer, Recharts net worth performance curves, and the dual-layout `<OrderPanel />` (Bento vs. Sidebar overlay) provide a highly responsive, institutional-grade simulated trading experience.
+3. **Atomic State Synchronization**: Our client-side event bus (`window.dispatchEvent`) enables zero-latency updates between transaction completions and portfolio widgets without relying on heavy polling or page reloads.
+4. **Clean-Compiled Type Safety**: Complete refactoring of all `any` casts to strict custom TypeScript interfaces, ensuring the linter compiles with **0 errors** and zero runtime risk.
+5. **Event-Driven Background AI Automation**: Using Inngest for background welcome digests andScheduled daily portfolio critics prevents serverless API functions from timing out during heavy Gemini inferences.
 
-### 2. Enhance the AI Advisor's Tooling
-- **Action:** Give the LangGraph agents inside `/stockadvisor` actual tools (using Vercel AI SDK's `tool` calling) to query the database. For example, allow the AI to look up the user's current virtual portfolio balance or watchlist.
-- **Why:** This turns the AI from a generic financial bot into a deeply personalized wealth manager.
+---
 
-### 3. Implement Virtual Trading Engine
-- **Action:** You currently have database models for `Transaction` and `Portfolio`. Hook these up to the UI so users can execute paper trades directly from the `/stocks/[symbol]` page using real-time Finnhub prices.
-- **Why:** Paper trading is the stickiest feature a stock platform can have. Users will return daily to check their portfolio performance.
+## 2. Current Weaknesses
 
-### 4. Robust Notification System
-- **Action:** Expand the Inngest background workers to track stock prices. If a stock in a user's watchlist drops or rises by >5%, send a personalized NodeMailer alert.
-- **Why:** Increases Daily Active Users (DAU) by actively pulling them back into the platform.
+1. **Dead Code Accumulation**: Legacy crypto assets, Chatwoot integrations, and older dashboard components remain in the folders. system cleanup remains a priority.
+2. **Missing E2E Tests**: There are no active Playwright tests configured to verify the simulated buy/sell transaction loops automatically during CI cycles.
+3. **Static Database Mocking**: The build phase successfully bypasses Mongo connection blocks through safe mock databases, but E2E database verification is required in pre-production.
+
+---
+
+## 3. Future Direction & Technical Roadmap
+
+Based on competitive research (Koyfin, Toggle AI, Composer), we have outlined the strategic plans for Zenith's next evolution:
+
+### Pillar A: Koyfin-Style Dynamic Bento Customizer
+* **Goal**: Enable users to drag, drop, resize, and hide widgets (interactive chart, financials, AI explainer, order slip) on `/stocks/[symbol]` using React Grid Layout libraries, rather than forcing a static two-column bento box.
+* **Why**: Let serious allocators customize their trading workspace structure to their liking.
+
+### Pillar B: Composer-Style Algorithmic Backtester
+* **Goal**: Equip the LangGraph Stock Advisor agents with backtesting tools. Users can type: *"Backtest buying NVDA every time RSI is under 35 and holding for 5 days,"* and the AI Advisor will compile this into rules, simulate the returns against historical data, and draw the resulting curve on the chart.
+* **Why**: Moves the AI advisor from a general conversational agent to an active strategy generator.
+
+### Pillar C: High-Impact Landing Page Interactive Overhaul
+* **Goal**: Elevate the marketing landing page (`app/(marketing)/page.tsx`) to an award-winning visual standard using progressive enhancement assets.
+* **Implementation Strategies**:
+  1. **High-Performance Canvas-Scroll Image Sequence (Apple-Style)**:
+     * *The Approach*: Preload a sequence of 500+ high-quality images. Draw them frame-by-frame on an HTML5 `<canvas>` inside a sticky scroll container by mapping `window.pageYOffset` to the current frame index.
+     * *Performance Optimization*: Use `requestAnimationFrame` debouncing and pre-cache images in memory to ensure buttery-smooth 60fps animations on standard scroll inputs without layout shifts.
+  2. **Optimized 3D Model Viewport (React Three Fiber / GLTF)**:
+     * *The Approach*: Embed a highly desaturated, brutalist 3D abstract object (like a steel monolith, representing "Zenith precision") using `@react-three/fiber` and `@react-three/drei`.
+     * *Performance Optimization*: Apply DRACO compression to the `.glb` model, use progressive fallback screens (a static image/cinematic video for lower-tier GPUs or mobile connections), and limit per-frame calculations to minimize GPU bottlenecks.
