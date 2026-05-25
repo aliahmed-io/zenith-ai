@@ -17,8 +17,11 @@ if(!cached) {
 
 export const connectToDatabase = async () => {
     if(!MONGODB_URI) {
+        if (process.env.npm_lifecycle_event === 'build') return null;
         throw new Error("MONGODB_URI is not defined in environment variables. A real database connection is required for build and runtime.");
     }
+
+    if (process.env.npm_lifecycle_event === 'build') return null;
 
     if(cached.conn) return cached.conn;
 

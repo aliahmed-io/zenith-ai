@@ -66,7 +66,7 @@ export default function SearchCommand({ renderAs = 'button', label = 'Add stock'
             {label}
           </Button>
       )}
-      <CommandDialog open={open} onOpenChange={setOpen} className="search-dialog">
+      <CommandDialog open={open} onOpenChange={setOpen}>
         <div className="search-field">
           <CommandInput value={searchTerm} onValueChange={setSearchTerm} placeholder="Search stocks..." className="search-input" />
           {loading && <Loader2 className="search-loader" />}

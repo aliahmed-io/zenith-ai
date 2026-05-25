@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     const truncatedMessages = trimToTokenBudget(messages);
     
     // Convert plain message objects to LangChain message instances
-    const langchainMessages = truncatedMessages.map((msg: any) => {
+    const langchainMessages = truncatedMessages.map(({ role: string, content: string }) => {
       if (msg.role === "user") {
         return new HumanMessage(msg.content);
       } else if (msg.role === "assistant") {

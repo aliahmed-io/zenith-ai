@@ -27,7 +27,7 @@ const NavItems = ({initialStocks}: { initialStocks: StockWithWatchlistStatus[]})
                     </li>
                 )
 
-                return <li key={href}>
+                return <li key={href} id={`nav-${href.replace(/\//g, '') || 'home'}`}>
                     <Link href={href} className={`hover:text-primary transition-colors ${
                         isActive(href) ? 'text-gray-100' : ''
                     }`}>

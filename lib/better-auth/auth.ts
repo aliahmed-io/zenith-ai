@@ -9,9 +9,11 @@ export const getAuth = async () => {
     if(authInstance) return authInstance;
 
     const mongoose = await connectToDatabase();
-    const db = mongoose.connection.db;
+    
+    // Mock db for build phase
+    const db = mongoose ? mongoose.connection.db : {} as any;
 
-    if(!db) throw new Error('MongoDB connection not found');
+    if(!db && !mongoose) throw new Error('MongoDB connection not found');
 
     authInstance = betterAuth({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

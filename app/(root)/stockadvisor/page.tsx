@@ -104,7 +104,7 @@ export default function StockAdvisor() {
   useEffect(() => {
     const initialMessage: Message = {
       role: "assistant",
-      content: `Hey there! I'm your Stock Buddy, powered by a team of AI specialists. Ask me anything about US stocks—like "Analyze AAPL" or "What's the RSI for TSLA?"—and my team will provide comprehensive analysis. What's on your mind?`,
+      content: `INITIALIZATION COMPLETE. NATIVE AI ONLINE. AWAITING MARKET QUERY.`,
       timestamp: new Date().toLocaleTimeString(),
     };
 
@@ -358,10 +358,10 @@ export default function StockAdvisor() {
       } catch (error: unknown) {
         clearTimeout(timeoutId);
 
-        if (error.name === 'AbortError') {
+        if (error instanceof Error && error.name === 'AbortError') {
           const errorMessage: Message = {
             role: "assistant",
-            content: `⏱️ **Request Timeout**: The analysis took too long. Please try a simpler query or try again.`,
+            content: `[TIMEOUT]: Analysis exceeded maximum execution threshold. Please simplify query.`,
             timestamp: new Date().toLocaleTimeString(),
           };
           setMessages((prev) => {
@@ -391,7 +391,7 @@ export default function StockAdvisor() {
         console.error("Error in chatbot:", error);
         const errorMessage: Message = {
           role: "assistant",
-          content: `🔧 **Error**: ${error instanceof Error ? error.message : "An unexpected error occurred. Please try again."}`,
+          content: `[SYSTEM ERROR]: ${error instanceof Error ? error.message : "An unexpected error occurred."}`,
           timestamp: new Date().toLocaleTimeString(),
         };
         setMessages((prev) => {
@@ -527,8 +527,8 @@ export default function StockAdvisor() {
                   {message.role === "assistant" && message.agentSteps && message.agentSteps.length > 0 && (
                     <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
                       <details className="text-xs">
-                        <summary className="cursor-pointer font-medium text-indigo-600 dark:text-indigo-400 mb-2">
-                          🤖 View Agent Workflow ({message.agentSteps.length} steps)
+                        <summary className="cursor-pointer font-bold font-mono text-primary mb-2 uppercase">
+                          [VIEW AGENT WORKFLOW] ({message.agentSteps.length} steps)
                         </summary>
                         <div className="mt-2 space-y-2">
                           {message.agentSteps.map((step, idx) => {

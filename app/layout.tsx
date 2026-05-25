@@ -1,21 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Libre_Caslon_Text, JetBrains_Mono, Archivo_Narrow } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner"
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const caslon = Libre_Caslon_Text({
+  weight: ["400", "700"],
+  variable: "--font-caslon",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrains = JetBrains_Mono({
+  weight: ["400", "500", "700"],
+  variable: "--font-jetbrains",
+  subsets: ["latin"],
+});
+
+const archivo = Archivo_Narrow({
+  weight: ["400", "600", "700"],
+  variable: "--font-archivo",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Zenith",
-  description: "Track real-time stock prices, get personalized alerts and explore detailed company insights.",
+  title: "Zenith | Tactical Finance",
+  description: "High-performance market terminal and liquidity engine.",
 };
 
 export default function RootLayout({
@@ -26,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${caslon.variable} ${jetbrains.variable} ${archivo.variable} antialiased`}
       >
         {children}
         <Toaster />
