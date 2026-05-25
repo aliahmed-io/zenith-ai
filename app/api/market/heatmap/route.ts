@@ -71,7 +71,7 @@ export async function GET() {
             price: data.c,
             change: data.dp // Percentage change
           };
-        } catch (_err) {
+        } catch {
           // Fallback if rate limited or fails
           return { ...stock, price: 0, change: 0 };
         }

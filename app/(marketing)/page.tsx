@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import VolatilityGrid from "@/components/trading/VolatilityGrid";
 import { 
   ArrowRight, 
   Activity, 
@@ -19,15 +21,13 @@ export default function MarketingPage() {
   return (
     <div className="min-h-screen bg-gray-900 text-gray-400 font-mono relative overflow-hidden flex flex-col justify-between">
       
-      {/* Background Grid Pattern */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" 
-           style={{ backgroundImage: 'linear-gradient(#e5e2e1 1px, transparent 1px), linear-gradient(90deg, #e5e2e1 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
-      </div>
+      {/* Dynamic Volatility Grid (Wow Factor Background) */}
+      <VolatilityGrid />
 
       {/* Navigation */}
       <nav className="relative z-10 w-full border-b border-gray-400 bg-gray-900/80 backdrop-blur-sm">
         <div className="w-full mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="text-xl font-bold font-serif text-white tracking-tighter flex items-center gap-2">
+          <div className="text-xl font-bold font-serif text-white tracking-tighter">
             ZENITH<span className="text-primary font-bold">.</span>
           </div>
           <div className="flex gap-4">
@@ -354,7 +354,8 @@ export default function MarketingPage() {
           
           {/* Logo & Info column */}
           <div className="md:col-span-4 flex flex-col gap-4 pr-0 md:pr-12 border-b md:border-b-0 md:border-r border-gray-800 pb-8 md:pb-0">
-            <div className="text-xl font-bold font-serif text-white tracking-tighter">
+            <div className="text-xl font-bold font-serif text-white tracking-tighter flex items-center gap-2">
+              <Image src="/zenith-logo.png" alt="Zenith Logo" width={24} height={24} className="w-6 h-6 object-contain" />
               ZENITH<span className="text-primary font-bold">.</span>
             </div>
             <p className="text-gray-500 uppercase leading-relaxed text-[10px]">
@@ -375,9 +376,9 @@ export default function MarketingPage() {
             </div>
             <div className="flex flex-col gap-2">
               <span className="text-white font-bold mb-1 tracking-wider">{"// LEGAL"}</span>
-              <Link href="#" className="hover:text-primary transition-colors">PRIVACY POLICY</Link>
-              <Link href="#" className="hover:text-primary transition-colors">TERMS OF SERVICE</Link>
-              <Link href="#" className="hover:text-primary transition-colors">API INTEGRATIONS</Link>
+              <Link href="/privacy" className="hover:text-primary transition-colors">PRIVACY POLICY</Link>
+              <Link href="/terms" className="hover:text-primary transition-colors">TERMS OF SERVICE</Link>
+              <Link href="/integrations" className="hover:text-primary transition-colors">API INTEGRATIONS</Link>
             </div>
           </div>
 

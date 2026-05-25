@@ -20,8 +20,6 @@ import {
 } from "recharts";
 import { 
   TrendingUp, 
-  TrendingDown, 
-  Coins, 
   Briefcase, 
   History, 
   ChevronRight, 
@@ -147,10 +145,9 @@ export default function Home() {
     return () => {
       window.removeEventListener("zenith-portfolio-update", handlePortfolioUpdate);
     };
-  }, []);
+  }, [fetchDashboardData]);
 
   // Compute total value, total cost, and performance returns
-  const totalCost = portfolio.positions.reduce((acc, pos) => acc + (pos.quantity * pos.averagePrice), 0);
   const totalHoldingsValue = portfolio.positions.reduce((acc, pos) => {
     const livePrice = livePrices[pos.symbol.toUpperCase()] ?? pos.averagePrice;
     return acc + (pos.quantity * livePrice);
@@ -194,6 +191,15 @@ export default function Home() {
     }
     return null;
   };
+
+  if (loading) {
+    return (
+      <div className="w-full h-96 flex items-center justify-center font-mono text-sm uppercase text-gray-500">
+        <Loader2 className="w-6 h-6 animate-spin text-primary mr-2" />
+        LOADING WORKSPACE DATA...
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">

@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { VisuallyHidden } from "@/components/ui/visually-hidden";
 
 /**
  * SkipToContent component for keyboard navigation

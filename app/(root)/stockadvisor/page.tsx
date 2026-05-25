@@ -4,13 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { Send, Loader2, TrendingUp, Trash2, X, Menu, Plus, Clock, Globe, MessageSquare, CheckCircle2 } from "lucide-react";
+import { Send, Loader2, TrendingUp, Trash2, X, Plus, Clock, Globe, MessageSquare, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { authClient } from "@/lib/better-auth/auth-client";
 import { useToast } from "@/hooks/use-toast";
 
-const blue500 = "#3B82F6";
 const indigo600 = "#4F46E5";
 
 // Agent metadata for UI display

@@ -13,7 +13,7 @@ const searchTool = tool(
         .slice(0, 5)
         .map(r => `[${r.title}]: ${r.description} (${r.url})`)
         .join("\n\n");
-    } catch (_e) {
+    } catch {
       return "Search failed or is temporarily unavailable.";
     }
   },
