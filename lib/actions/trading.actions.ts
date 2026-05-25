@@ -94,7 +94,7 @@ export const executeTrade = async (symbol: string, type: 'BUY' | 'SELL', quantit
       await transaction.save();
     }
 
-    return { success: true, transactionId: String((transaction as any)._id) };
+    return { success: true, transactionId: String((transaction as unknown as { _id: unknown })._id) };
   } catch (error: unknown) {
     console.error("Trade execution failed:", error);
     return { success: false, error: error instanceof Error ? error.message : "Unknown error" };

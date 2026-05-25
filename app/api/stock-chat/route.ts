@@ -21,11 +21,11 @@ export const maxDuration = 60; // 60 seconds for complex analysis
 export async function POST(req: NextRequest) {
   try {
     // Check for required environment variables
-    if (!process.env.NEXT_PUBLIC_GROQ_API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
         { 
-          error: "Server configuration error: NEXT_PUBLIC_GROQ_API_KEY not set",
-          details: "Please set the NEXT_PUBLIC_GROQ_API_KEY environment variable in .env.local"
+          error: "Server configuration error: GEMINI_API_KEY not set",
+          details: "Please set the GEMINI_API_KEY environment variable in .env.local"
         },
         { status: 500 }
       );
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     const truncatedMessages = trimToTokenBudget(messages);
     
     // Convert plain message objects to LangChain message instances
-    const langchainMessages = truncatedMessages.map(({ role: string, content: string }) => {
+    const langchainMessages = truncatedMessages.map((msg: { role: string, content: string }) => {
       if (msg.role === "user") {
         return new HumanMessage(msg.content);
       } else if (msg.role === "assistant") {
@@ -73,7 +73,12 @@ export async function POST(req: NextRequest) {
           // Process each event from the graph
           for await (const event of eventStream) {
             // Extract the current node being executed
-            const nodeData = event as any;
+            interface NodeData {
+              messages?: { content: string }[];
+              next?: string;
+              data?: Record<string, unknown>;
+            }
+            const nodeData = event as NodeData;
             const messages = nodeData.messages || [];
             const lastMessage = messages[messages.length - 1];
             const next = nodeData.next;

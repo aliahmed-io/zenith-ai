@@ -57,9 +57,20 @@ export const PriceChart = memo(function PriceChart({ symbol, data }: PriceChartP
 
   const chartData = data ?? sampleData;
 
-  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: any[] }) => {
+  interface TooltipPayloadItem {
+    payload: {
+      date: string;
+      open: number;
+      high: number;
+      low: number;
+      close: number;
+      volume: number;
+    };
+  }
+
+  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: TooltipPayloadItem[] }) => {
     if (active && payload && payload.length) {
-      const data = payload[0].payload;
+      const data = payload[0]!.payload;
       return (
         <div className="bg-card border rounded-lg p-3 shadow-lg">
           <p className="font-semibold mb-2">{data.date}</p>

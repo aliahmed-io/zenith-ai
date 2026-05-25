@@ -87,12 +87,12 @@ export default function MarketingPage() {
           <div className="p-10 flex flex-col gap-6">
             <Activity className="w-10 h-10 text-primary" />
             <h3 className="text-2xl font-serif text-white font-bold">RAW DATA</h3>
-            <p className="text-sm text-gray-400">Unfiltered market feeds. We don't smooth the noise, we give you the tools to exploit it.</p>
+            <p className="text-sm text-gray-400">Unfiltered market feeds. We don&apos;t smooth the noise, we give you the tools to exploit it.</p>
           </div>
           <div className="p-10 flex flex-col gap-6">
             <Globe className="w-10 h-10 text-primary" />
             <h3 className="text-2xl font-serif text-white font-bold">LIVE AI GROUNDING</h3>
-            <p className="text-sm text-gray-400">Our native AI doesn't guess. It queries global financial news instantly to explain market movements.</p>
+            <p className="text-sm text-gray-400">Our native AI doesn&apos;t guess. It queries global financial news instantly to explain market movements.</p>
           </div>
           <div className="p-10 flex flex-col gap-6">
             <Shield className="w-10 h-10 text-primary" />

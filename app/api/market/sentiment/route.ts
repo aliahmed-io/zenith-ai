@@ -30,7 +30,7 @@ export async function GET(req: Request) {
       score: mockScore,
       analysis: `Recent market data suggests a ${randomSentiment.toLowerCase()} trend for ${symbol.toUpperCase()}.`
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Unknown error" }, { status: 500 });
   }
 }

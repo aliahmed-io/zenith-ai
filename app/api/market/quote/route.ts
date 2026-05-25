@@ -23,7 +23,7 @@ export async function GET(req: Request) {
     const mockPrice = Math.floor(Math.random() * 500) + 10;
 
     return NextResponse.json({ symbol: symbol.toUpperCase(), price: mockPrice });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Unknown error" }, { status: 500 });
   }
 }

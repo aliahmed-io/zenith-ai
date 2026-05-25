@@ -1,11 +1,15 @@
-import { BaseMessage } from "@langchain/core/messages";
+export interface ChatMessage {
+  role: string;
+  content: string;
+}
 
-export function trimToTokenBudget(messages: any[], maxTokens = 4000) {
+export function trimToTokenBudget(messages: ChatMessage[], maxTokens = 4000) {
   // Simple heuristic: 1 token ~= 4 characters
   let currentTokens = 0;
-  const trimmed = [];
+  const trimmed: ChatMessage[] = [];
   for (let i = messages.length - 1; i >= 0; i--) {
     const msg = messages[i];
+    if (!msg) continue;
     const estimatedTokens = (msg.content?.length || 0) / 4;
     if (currentTokens + estimatedTokens > maxTokens) {
       break;
@@ -15,7 +19,10 @@ export function trimToTokenBudget(messages: any[], maxTokens = 4000) {
   }
   // Always include at least the last message
   if (trimmed.length === 0 && messages.length > 0) {
-    trimmed.push(messages[messages.length - 1]);
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg) {
+      trimmed.push(lastMsg);
+    }
   }
   return trimmed;
 }

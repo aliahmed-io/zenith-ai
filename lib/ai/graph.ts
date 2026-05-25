@@ -1,5 +1,5 @@
 import { StateGraph, END, START, MessagesAnnotation } from "@langchain/langgraph";
-import { ChatGroq } from "@langchain/groq";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { HumanMessage, AIMessage, ToolMessage } from "@langchain/core/messages";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
@@ -28,10 +28,19 @@ const searchTool = tool(
 
 const tools = [searchTool];
 
-const llm = new ChatGroq({
-  model: "llama3-8b-8192",
-  apiKey: process.env.NEXT_PUBLIC_GROQ_API_KEY || "dummy-key-for-build",
+const llmPrimary = new ChatGoogleGenerativeAI({
+  model: "gemini-3.1-flash-lite",
+  apiKey: process.env.GEMINI_API_KEY || "dummy-key-for-build",
 }).bindTools(tools);
+
+const llmFallback = new ChatGoogleGenerativeAI({
+  model: "gemini-3.5-flash",
+  apiKey: process.env.GEMINI_API_KEY || "dummy-key-for-build",
+}).bindTools(tools);
+
+const llm = llmPrimary.withFallbacks({
+  fallbacks: [llmFallback]
+});
 
 export const stockAdvisorGraph = new StateGraph(MessagesAnnotation)
   .addNode("agent", async (state) => {
@@ -52,7 +61,7 @@ CRITICAL DIRECTIVES:
       return { messages: [] };
     }
     
-    const [] = [];
+    const toolMessages: unknown[] = [];
     for (const toolCall of lastMessage.tool_calls) {
       if (toolCall.name === "web_search" && toolCall.id) {
         const result = await searchTool.invoke(toolCall);

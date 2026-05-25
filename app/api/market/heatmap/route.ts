@@ -2,8 +2,16 @@ import { NextResponse } from 'next/server';
 
 const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1';
 
+interface StockData {
+  symbol: string;
+  name: string;
+  sector: string;
+  price: number;
+  change: number;
+}
+
 // Cache to prevent Finnhub rate limits (60/min free tier)
-let heatmapCache: any = null;
+let heatmapCache: StockData[] | null = null;
 let lastFetch = 0;
 
 const STOCKS = [
@@ -74,7 +82,7 @@ export async function GET() {
     lastFetch = now;
 
     return NextResponse.json({ data: results });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Unknown error" }, { status: 500 });
   }
 }
