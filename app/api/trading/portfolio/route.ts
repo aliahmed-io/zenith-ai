@@ -21,7 +21,7 @@ export async function GET() {
     if(!db) throw new Error('MongoDB connection not found');
     
     const user = await db.collection("user").findOne({ id: userId });
-    const virtualBalance = user?.virtualBalance || 0;
+    const virtualBalance = typeof user?.virtualBalance === 'number' ? user.virtualBalance : 100000;
 
     const portfolio = await Portfolio.find({ userId });
 

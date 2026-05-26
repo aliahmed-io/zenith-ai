@@ -3,6 +3,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import TradingViewWidget from "@/components/TradingViewWidget";
+import NativeNewsFeed from "@/components/market/NativeNewsFeed";
+import NativeMarketQuotes from "@/components/market/NativeMarketQuotes";
+import NativeMarketOverview from "@/components/market/NativeMarketOverview";
+import PortfolioRoast from "@/components/ai/PortfolioRoast";
+import NativeHeatmap from "@/components/market/NativeHeatmap";
 import {
   HEATMAP_WIDGET_CONFIG,
   MARKET_DATA_WIDGET_CONFIG,
@@ -65,15 +70,17 @@ export default function Home() {
   const [livePrices, setLivePrices] = useState<Record<string, number>>({});
   const [fetchingQuotes, setFetchingQuotes] = useState(false);
 
-  // Fetch portfolio & positions from server action APIs
   const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
+      let currentPositions = [];
+
       // 1. Fetch portfolio balance and active holdings
       const portfolioRes = await fetch("/api/trading/portfolio");
       if (portfolioRes.ok) {
         const portfolioData: PortfolioData = await portfolioRes.json();
         setPortfolio(portfolioData);
+        currentPositions = portfolioData.positions;
 
         // 2. Proactively fetch live quotes for all active holdings
         if (portfolioData.positions.length > 0) {
@@ -113,7 +120,7 @@ export default function Home() {
       } else {
         // Fallback: fetch a mock transaction list based on positions to look full and realistic
         const mockTrans: Transaction[] = [];
-        portfolio.positions.forEach((pos, idx) => {
+        currentPositions.forEach((pos: any, idx: number) => {
           mockTrans.push({
             _id: `mock-tx-${idx}`,
             symbol: pos.symbol,
@@ -133,7 +140,7 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, [portfolio.positions]);
+  }, []);
 
   useEffect(() => {
     fetchDashboardData();
@@ -290,7 +297,7 @@ export default function Home() {
               PORTFOLIO EQUITY VALUE OVER TIME (30D)
             </h3>
             <div className="w-full h-[320px] bg-gray-950 border border-gray-800 p-2">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height={304}>
                 <AreaChart data={netWorthHistory}>
                   <defs>
                     <linearGradient id="colorNetWorth" x1="0" y1="0" x2="0" y2="1">
@@ -329,17 +336,39 @@ export default function Home() {
             
             {/* Holdings Table Column */}
             <div className="lg:col-span-8 bento-card p-6 flex flex-col gap-4">
-              <div className="flex justify-between items-center border-b border-gray-800 pb-3">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-800 pb-3">
                 <h3 className="label-caps text-white flex items-center gap-2">
                   <Briefcase className="w-4 h-4 text-primary" />
                   SIMULATED ACTIVE HOLDINGS
                 </h3>
-                {fetchingQuotes ? (
-                  <span className="text-[10px] text-gray-500 font-mono flex items-center gap-1.5">
-                    <Loader2 className="w-3 h-3 animate-spin text-gray-500" />
-                    LIVE QUOTING
-                  </span>
-                ) : null}
+                <div className="flex flex-wrap items-center gap-4">
+                  {fetchingQuotes ? (
+                    <span className="text-[10px] text-gray-500 font-mono flex items-center gap-1.5">
+                      <Loader2 className="w-3 h-3 animate-spin text-gray-500" />
+                      LIVE QUOTING
+                    </span>
+                  ) : null}
+                  <form 
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const formData = new FormData(e.currentTarget);
+                      const symbol = formData.get("symbol");
+                      if (symbol) window.location.href = `/stocks/${(symbol as string).toUpperCase()}`;
+                    }}
+                    className="flex items-center border border-gray-600 bg-gray-950 shadow-[2px_2px_0px_rgba(255,79,0,0.5)]"
+                  >
+                    <input 
+                      type="text" 
+                      name="symbol" 
+                      placeholder="TICKER (e.g. AAPL)" 
+                      className="bg-transparent text-xs text-white font-mono uppercase px-3 py-1.5 outline-none w-32 md:w-40"
+                      required
+                    />
+                    <button type="submit" className="bg-primary text-black font-bold text-xs px-3 py-1.5 font-mono hover:bg-orange-500 transition-colors">
+                      TRADE
+                    </button>
+                  </form>
+                </div>
               </div>
 
               {portfolio.positions.length === 0 ? (
@@ -435,6 +464,9 @@ export default function Home() {
 
           </div>
 
+          {/* AI Portfolio Roast */}
+          <PortfolioRoast />
+
         </div>
       )}
 
@@ -442,38 +474,36 @@ export default function Home() {
       {viewMode === "INDICES" && (
         <div className="flex flex-col gap-0 border border-gray-400 divide-y divide-gray-400 shadow-[4px_4px_0px_#000] animate-in fade-in duration-200">
           <section className="grid grid-cols-1 lg:grid-cols-3 gap-0 divide-y lg:divide-y-0 lg:divide-x divide-gray-400">
-            <div className="lg:col-span-1 p-0">
-              <TradingViewWidget
-                title="Market Overview"
-                scriptUrl={`${scriptUrl}market-overview.js`}
-                config={MARKET_OVERVIEW_WIDGET_CONFIG}
-                className="custom-chart"
-                height={600}
-              />
+            <div className="lg:col-span-1 p-0 overflow-hidden relative" style={{ height: 600 }}>
+              {/* Wrapping the widget in a taller div to push the bottom branding out of the hidden overflow container */}
+              <div style={{ height: 640, width: "100%", position: "absolute", top: 0, left: 0 }}>
+                <TradingViewWidget
+                  title="Market Overview"
+                  scriptUrl={`${scriptUrl}market-overview.js`}
+                  config={MARKET_OVERVIEW_WIDGET_CONFIG}
+                  className="custom-chart"
+                  height={640}
+                />
+              </div>
             </div>
-            <div className="lg:col-span-2 p-0 bg-gray-900">
-              <TradingViewWidget
-                title="Stock Heatmap"
-                scriptUrl={`${scriptUrl}stock-heatmap.js`}
-                config={HEATMAP_WIDGET_CONFIG}
-                height={600}
-              />
+            <div className="lg:col-span-2 p-0 bg-gray-900 overflow-hidden relative" style={{ height: 600 }}>
+               {/* Wrapping the widget in a taller div to push the bottom branding out of the hidden overflow container */}
+               <div style={{ height: 640, width: "100%", position: "absolute", top: 0, left: 0 }}>
+                <TradingViewWidget
+                  title="Stock Heatmap"
+                  scriptUrl={`${scriptUrl}stock-heatmap.js`}
+                  config={HEATMAP_WIDGET_CONFIG}
+                  height={640}
+                />
+              </div>
             </div>
           </section>
           <section className="grid grid-cols-1 lg:grid-cols-3 gap-0 divide-y lg:divide-y-0 lg:divide-x divide-gray-400">
             <div className="lg:col-span-1 p-0">
-              <TradingViewWidget
-                scriptUrl={`${scriptUrl}timeline.js`}
-                config={TOP_STORIES_WIDGET_CONFIG}
-                height={600}
-              />
+              <NativeNewsFeed height={600} />
             </div>
-            <div className="lg:col-span-2 p-0">
-              <TradingViewWidget
-                scriptUrl={`${scriptUrl}market-quotes.js`}
-                config={MARKET_DATA_WIDGET_CONFIG}
-                height={600}
-              />
+            <div className="lg:col-span-2 p-0 bg-gray-900">
+              <NativeMarketQuotes height={600} />
             </div>
           </section>
         </div>

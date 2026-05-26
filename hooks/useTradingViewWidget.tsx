@@ -15,10 +15,29 @@ const useTradingViewWidget = (scriptUrl: string, config: Record<string, unknown>
         script.async = true;
         script.innerHTML = JSON.stringify(config);
 
+        // Prevent TradingView from opening new tabs or redirecting by sandboxing its iframes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeName === 'IFRAME') {
+                        (node as HTMLIFrameElement).setAttribute('sandbox', 'allow-scripts allow-same-origin');
+                    } else if (node.childNodes && node.childNodes.length > 0) {
+                        // Sometimes the iframe is nested inside a newly added div
+                        const iframes = (node as HTMLElement).querySelectorAll?.('iframe');
+                        iframes?.forEach(iframe => {
+                            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+                        });
+                    }
+                });
+            });
+        });
+        observer.observe(container, { childList: true, subtree: true });
+
         container.appendChild(script);
         container.dataset.loaded = 'true';
 
         return () => {
+            observer.disconnect();
             if(container) {
                 container.innerHTML = '';
                 delete container.dataset.loaded;

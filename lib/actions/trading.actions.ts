@@ -26,7 +26,7 @@ export const executeTrade = async (symbol: string, type: 'BUY' | 'SELL', quantit
     if (!user) throw new Error("User not found");
     
     // User might have it directly from the db doc, defaults to 0 if missing somehow
-    const virtualBalance = user.virtualBalance || 0;
+    const virtualBalance = typeof user.virtualBalance === 'number' ? user.virtualBalance : 100000;
 
     // Create the transaction record as pending
     const transaction = await Transaction.create({

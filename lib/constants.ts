@@ -2,6 +2,9 @@ export const NAV_ITEMS = [
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/watchlist', label: 'Watchlist' },
     { href: '/stockadvisor', label: 'AI Advisor' },
+    { href: '/sandbox', label: 'Sandbox' },
+    { href: '/news-decoder', label: 'News Decoder' },
+    { href: '/debate', label: 'AI Debate' },
 ];
 
 

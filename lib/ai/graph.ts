@@ -1,6 +1,6 @@
 import { StateGraph, END, START, MessagesAnnotation } from "@langchain/langgraph";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { HumanMessage, AIMessage, ToolMessage } from "@langchain/core/messages";
+import { SystemMessage, HumanMessage, AIMessage, ToolMessage } from "@langchain/core/messages";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { search } from "duck-duck-scrape";
@@ -26,7 +26,53 @@ const searchTool = tool(
   }
 );
 
-const tools = [searchTool];
+const getStockPriceTool = tool(
+  async ({ symbol }) => {
+    try {
+      const token = process.env.FINNHUB_API_KEY || process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
+      if (!token) return "Finnhub API key missing.";
+      const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${token}`);
+      const data = await res.json();
+      if (data.c === 0 && data.d === null) return `No data found for symbol: ${symbol}`;
+      return `Real-time quote for ${symbol}: Current Price: $${data.c}, High: $${data.h}, Low: $${data.l}, Open: $${data.o}, Previous Close: $${data.pc}`;
+    } catch (e) {
+      return "Failed to fetch stock price.";
+    }
+  },
+  {
+    name: "get_stock_price",
+    description: "Get real-time stock price quotes for a specific ticker symbol (e.g., AAPL, NVDA).",
+    schema: z.object({
+      symbol: z.string().describe("The stock ticker symbol"),
+    }),
+  }
+);
+
+const getStockNewsTool = tool(
+  async ({ symbol }) => {
+    try {
+      const token = process.env.FINNHUB_API_KEY || process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
+      if (!token) return "Finnhub API key missing.";
+      const to = new Date().toISOString().split('T')[0];
+      const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const res = await fetch(`https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=${from}&to=${to}&token=${token}`);
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) return `No recent news found for ${symbol}.`;
+      return data.slice(0, 5).map((n: any) => `[${new Date(n.datetime * 1000).toISOString().split('T')[0]}] ${n.headline}: ${n.summary}`).join('\n\n');
+    } catch (e) {
+      return "Failed to fetch stock news.";
+    }
+  },
+  {
+    name: "get_stock_news",
+    description: "Get the latest official company news for a specific stock ticker symbol.",
+    schema: z.object({
+      symbol: z.string().describe("The stock ticker symbol"),
+    }),
+  }
+);
+
+const tools = [searchTool, getStockPriceTool, getStockNewsTool];
 
 const llmPrimary = new ChatGoogleGenerativeAI({
   model: "gemini-3.1-flash-lite",
@@ -44,13 +90,14 @@ const llm = llmPrimary.withFallbacks({
 
 export const stockAdvisorGraph = new StateGraph(MessagesAnnotation)
   .addNode("agent", async (state) => {
-    const systemMessage = new HumanMessage(`INITIALIZATION COMPLETE. NATIVE AI ONLINE. AWAITING MARKET QUERY.
+    const systemMessage = new SystemMessage(`INITIALIZATION COMPLETE. NATIVE AI ONLINE. AWAITING MARKET QUERY.
 You are the Zenith AI System Terminal, an elite analytical engine. 
 CRITICAL DIRECTIVES:
-1. You MUST use the web_search tool to find the most recent, up-to-date information before answering ANY questions about current stock prices, news, or market events.
-2. ONLY trust and explicitly cite credible financial sources (e.g., Bloomberg, Reuters, WSJ, CNBC, Financial Times).
-3. DO NOT use emojis. DO NOT use conversational filler (e.g., "Hey there", "Sure!"). 
-4. Maintain a strictly tactical, brutalist, and objective tone. Use structured data formats when applicable.`);
+1. You MUST use the get_stock_price and get_stock_news tools to fetch real-time financial data before answering ANY questions about current stock prices, news, or market events.
+2. If those tools fail, fallback to web_search.
+3. ONLY trust and explicitly cite credible financial sources (e.g., Bloomberg, Reuters, WSJ, CNBC, Financial Times).
+4. DO NOT use emojis. DO NOT use conversational filler (e.g., "Hey there", "Sure!"). 
+5. Maintain a strictly tactical, brutalist, and objective tone. Use structured data formats when applicable.`);
     const response = await llm.invoke([systemMessage, ...state.messages]);
     return { messages: [response] };
   })
@@ -65,6 +112,20 @@ CRITICAL DIRECTIVES:
     for (const toolCall of lastMessage.tool_calls) {
       if (toolCall.name === "web_search" && toolCall.id) {
         const result = await searchTool.invoke(toolCall);
+        toolMessages.push(new ToolMessage({
+          content: typeof result === 'string' ? result : JSON.stringify(result),
+          tool_call_id: toolCall.id,
+          name: toolCall.name,
+        }));
+      } else if (toolCall.name === "get_stock_price" && toolCall.id) {
+        const result = await getStockPriceTool.invoke(toolCall);
+        toolMessages.push(new ToolMessage({
+          content: typeof result === 'string' ? result : JSON.stringify(result),
+          tool_call_id: toolCall.id,
+          name: toolCall.name,
+        }));
+      } else if (toolCall.name === "get_stock_news" && toolCall.id) {
+        const result = await getStockNewsTool.invoke(toolCall);
         toolMessages.push(new ToolMessage({
           content: typeof result === 'string' ? result : JSON.stringify(result),
           tool_call_id: toolCall.id,

@@ -66,73 +66,47 @@ export async function POST(req: NextRequest) {
               messages: langchainMessages,
             },
             {
-              streamMode: "values",
+              streamMode: "updates",
             }
           );
           
+          let finalSent = false;
           // Process each event from the graph
           for await (const event of eventStream) {
-            // Extract the current node being executed
-            interface NodeData {
-              messages?: { content: string }[];
-              next?: string;
-              data?: Record<string, unknown>;
-            }
-            const nodeData = event as NodeData;
+            const nodeName = Object.keys(event)[0];
+            const nodeData = event[nodeName];
             const messages = nodeData.messages || [];
-            const lastMessage = messages[messages.length - 1];
-            const next = nodeData.next;
+            const lastMessage = messages[messages.length - 1] as any;
             
-            // Determine which agent is active
-            let agentStatus = null;
-            let messageContent = "";
-            
-            if (lastMessage) {
-              messageContent = typeof lastMessage.content === "string" 
-                ? lastMessage.content 
-                : JSON.stringify(lastMessage.content);
-              
-              // Parse routing messages
-              if (messageContent.includes("[Routing to")) {
-                const match = messageContent.match(/\[Routing to (\w+)\]/);
-                if (match) {
-                  agentStatus = {
-                    agent: match[1],
-                    status: "routing",
-                    message: messageContent.replace(/\[Routing to \w+\]\s*/, ""),
-                  };
-                }
-              } else if (messageContent.includes("Technical Analyst")) {
-                agentStatus = {
-                  agent: "TechnicalAnalyst",
-                  status: "working",
-                  message: "Analyzing price and technical indicators...",
-                };
-              } else if (messageContent.includes("Sentiment Analyst")) {
-                agentStatus = {
-                  agent: "SentimentAnalyst",
-                  status: "working",
-                  message: "Analyzing social sentiment...",
-                };
-              } else if (messageContent.includes("Market Researcher")) {
-                agentStatus = {
-                  agent: "MarketResearcher",
-                  status: "working",
-                  message: "Researching market intelligence...",
-                };
-              }
+            let type = "agent";
+            let status = "working";
+            let messageContent = "Processing...";
+            let agent = nodeName;
+
+            if (nodeName === "tools") {
+               agent = "MarketResearcher";
+               status = "working";
+               messageContent = "Searching the web and analyzing market data...";
+            } else if (nodeName === "agent") {
+               // Check if the agent called a tool
+               if (lastMessage && lastMessage.tool_calls && lastMessage.tool_calls.length > 0) {
+                  agent = "Supervisor";
+                  status = "routing";
+                  messageContent = "Delegating to Market Researcher...";
+               } else if (lastMessage) {
+                  agent = "FinalResponse";
+                  status = "done";
+                  messageContent = typeof lastMessage.content === "string" ? lastMessage.content : JSON.stringify(lastMessage.content);
+                  type = "final";
+               }
             }
-            
-            // Check if this is the final response
-            const isFinalResponse = next === "__end__" || !next;
-            
-            // Send event to client
+
             const eventData = {
-              type: isFinalResponse ? "final" : "agent",
-              agent: agentStatus?.agent || next || "unknown",
-              status: agentStatus?.status || "working",
-              message: isFinalResponse ? messageContent : (agentStatus?.message || "Processing..."),
-              data: nodeData.data || {},
+              type,
+              agent,
+              status,
+              message: messageContent,
+              data: {},
               timestamp: new Date().toISOString(),
             };
             
@@ -141,10 +115,15 @@ export async function POST(req: NextRequest) {
             controller.enqueue(encoder.encode(sseMessage));
             
             // If this is the final response, close the stream
-            if (isFinalResponse) {
+            if (type === "final") {
+              finalSent = true;
               controller.close();
               return;
             }
+          }
+          
+          if (!finalSent) {
+             controller.close();
           }
           
           controller.close();

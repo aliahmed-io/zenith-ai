@@ -43,3 +43,13 @@ Based on competitive research (Koyfin, Toggle AI, Composer), we have outlined th
   2. **Optimized 3D Model Viewport (React Three Fiber / GLTF)**:
      * *The Approach*: Embed a highly desaturated, brutalist 3D abstract object (like a steel monolith, representing "Zenith precision") using `@react-three/fiber` and `@react-three/drei`.
      * *Performance Optimization*: Apply DRACO compression to the `.glb` model, use progressive fallback screens (a static image/cinematic video for lower-tier GPUs or mobile connections), and limit per-frame calculations to minimize GPU bottlenecks.
+
+### Pillar D: AI Trader DNA Profile
+* **Goal**: After a user has made enough trades in the simulator, the AI analyzes their entire transaction history and builds a psychological trading profile. It identifies behavioral patterns: panic-selling, momentum chasing, contrarian bets, overconfidence bias, loss aversion.
+* **Implementation**: Generate a visual "DNA strand" or radar chart showing the user's strengths and blind spots across 6 dimensions (Risk Tolerance, Timing Discipline, Diversification Instinct, Conviction Strength, Loss Management, Trend Recognition). Include personalized coaching tips from Gemini.
+* **Why**: Transforms Zenith from a trading tool into a self-improvement platform. No competitor offers AI-powered behavioral finance coaching based on actual simulated trade history.
+
+### Pillar E: AI Price Target Challenge
+* **Goal**: Instead of binary BUY/SELL decisions (like the Sandbox), the user is shown a stock and asked to predict the **exact price** 7 days from now. The AI scores prediction accuracy, tracks calibration over time, and teaches behavioral finance lessons (overconfidence bias, anchoring effects) through gamified gameplay.
+* **Implementation**: Extend the Sandbox infrastructure with a new "Price Prediction" mode. Track historical predictions in MongoDB, compute a rolling accuracy score and calibration curve, and have Gemini generate personalized debiasing advice after each round.
+* **Why**: Teaches quantitative prediction skills and self-awareness about cognitive biases — skills that are universally valuable beyond trading.
