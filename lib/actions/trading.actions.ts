@@ -5,6 +5,7 @@ import { Portfolio } from "@/database/models/portfolio.model";
 import { Transaction } from "@/database/models/transaction.model";
 import { auth } from "@/lib/better-auth/auth";
 import { headers } from "next/headers";
+import mongoose from "mongoose";
 
 export const executeTrade = async (symbol: string, type: 'BUY' | 'SELL', quantity: number, currentPrice: number) => {
   try {
@@ -18,11 +19,12 @@ export const executeTrade = async (symbol: string, type: 'BUY' | 'SELL', quantit
     const userId = session.user.id;
     const totalAmount = quantity * currentPrice;
 
-    const mongoose = await connectToDatabase();
+    await connectToDatabase();
     const db = mongoose.connection.db;
     if(!db) throw new Error('MongoDB connection not found');
     
-    const user = await db.collection("user").findOne({ id: userId });
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const user = await db.collection("user").findOne({ _id: userObjectId });
     if (!user) throw new Error("User not found");
     
     // User might have it directly from the db doc, defaults to 0 if missing somehow
@@ -43,11 +45,11 @@ export const executeTrade = async (symbol: string, type: 'BUY' | 'SELL', quantit
       if (virtualBalance < totalAmount) {
         transaction.status = 'FAILED';
         await transaction.save();
-        throw new Error("Insufficient virtual balance");
+        throw new Error("Insufficient funds");
       }
       
       // Update user's virtual balance
-      await db.collection("user").updateOne({ id: userId }, { $inc: { virtualBalance: -totalAmount } });
+      await db.collection("user").updateOne({ _id: userObjectId }, { $inc: { virtualBalance: -totalAmount } });
       
       // Upsert portfolio
       const existingPosition = await Portfolio.findOne({ userId, symbol });
@@ -80,7 +82,7 @@ export const executeTrade = async (symbol: string, type: 'BUY' | 'SELL', quantit
       }
       
       // Update user's virtual balance
-      await db.collection("user").updateOne({ id: userId }, { $inc: { virtualBalance: totalAmount } });
+      await db.collection("user").updateOne({ _id: userObjectId }, { $inc: { virtualBalance: totalAmount } });
       
       // Update portfolio
       existingPosition.quantity -= quantity;
