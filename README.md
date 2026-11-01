@@ -1,6 +1,21 @@
-# Zenith Platform 🚀
+# Zenith AI
 
-Welcome to Zenith, the ultimate Apple-level minimalist financial learning platform. This project is a unified architecture merging real-time market data, AI-powered agentic insights, and robust portfolio simulation into one cohesive dark-mode experience.
+A financial-learning prototype combining market-data integrations, AI-assisted research, and paper trading with virtual funds. Built with Next.js, MongoDB, and a streaming multi-agent advisor.
+
+## Website preview
+
+### Public landing page
+
+![Zenith financial-learning landing page](docs/images/landing.png)
+
+### Integration directory
+
+![Zenith public integration directory](docs/images/integrations.png)
+
+These are screenshots of the local application. The market dashboard, advisor, and paper-trading workspace require sign-in; they were not captured for this update. Figures in the marketing preview are illustrative and are not a live account balance or verified investment result.
+
+The platform uses virtual funds for learning. Configured database, market-data, AI, and background-job services are required for their respective workflows. The screenshots do not establish investment performance or verify every integration.
+
 
 ## 📄 Documentation & Deep Dives
 For a deeper understanding of the platform's current state, strengths, weaknesses, and future roadmaps, please refer to:
@@ -12,7 +27,7 @@ For a deeper understanding of the platform's current state, strengths, weaknesse
 This platform is built on three core pillars:
 
 ### 1. Main UI Shell
-- **Framework:** Next.js 15 (App Router, Server Components, Turbopack)
+- **Framework:** Next.js 16 (App Router, Server Components, Turbopack)
 - **Database:** MongoDB & Mongoose
 - **Authentication:** `better-auth`
 - **Styling:** Tailwind CSS + `shadcn/ui` + Framer Motion
