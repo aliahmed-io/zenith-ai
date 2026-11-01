@@ -123,20 +123,29 @@ export async function evaluateSandboxDecision(
     prompt,
   });
   
-  // Save to database
-  const simulation = await SandboxSimulation.create({
-    userId,
-    symbol,
-    scenarioDate,
-    decision,
-    outcome,
-    priceAtDecision,
-    priceAfter30Days,
-    aiAnalysis,
-  });
+  // Save to database if connected
+  let simulationId = `sim-${Date.now()}`;
+  try {
+    const conn = await connectToDatabase();
+    if (conn?.connection?.db) {
+      const simulation = await SandboxSimulation.create({
+        userId,
+        symbol,
+        scenarioDate,
+        decision,
+        outcome,
+        priceAtDecision,
+        priceAfter30Days,
+        aiAnalysis,
+      });
+      simulationId = simulation._id.toString();
+    }
+  } catch (err) {
+    console.warn("Simulation database save skipped (offline):", err);
+  }
   
   return {
-    simulationId: simulation._id.toString(),
+    simulationId,
     outcome,
     priceAtDecision,
     priceAfter30Days,
@@ -146,7 +155,14 @@ export async function evaluateSandboxDecision(
 }
 
 export async function getUserSimulations(userId: string) {
-  await connectToDatabase();
-  const simulations = await SandboxSimulation.find({ userId }).sort({ createdAt: -1 });
-  return JSON.parse(JSON.stringify(simulations));
+  try {
+    const conn = await connectToDatabase();
+    if (conn?.connection?.db) {
+      const simulations = await SandboxSimulation.find({ userId }).sort({ createdAt: -1 });
+      return JSON.parse(JSON.stringify(simulations));
+    }
+  } catch (err) {
+    console.warn("Simulation history fetch skipped (offline):", err);
+  }
+  return [];
 }
