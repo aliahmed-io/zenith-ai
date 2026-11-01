@@ -8,6 +8,7 @@ export async function getWatchlistSymbolsByEmail(email: string): Promise<string[
 
   try {
     const mongoose = await connectToDatabase();
+    if (!mongoose) return [];
     const db = mongoose.connection.db;
     if (!db) throw new Error('MongoDB connection not found');
 

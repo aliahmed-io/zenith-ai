@@ -73,7 +73,7 @@ export default function Home() {
   const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
-      let currentPositions = [];
+      let currentPositions: Position[] = [];
 
       // 1. Fetch portfolio balance and active holdings
       const portfolioRes = await fetch("/api/trading/portfolio");
@@ -120,7 +120,7 @@ export default function Home() {
       } else {
         // Fallback: fetch a mock transaction list based on positions to look full and realistic
         const mockTrans: Transaction[] = [];
-        currentPositions.forEach((pos: any, idx: number) => {
+        currentPositions.forEach((pos: Position, idx: number) => {
           mockTrans.push({
             _id: `mock-tx-${idx}`,
             symbol: pos.symbol,

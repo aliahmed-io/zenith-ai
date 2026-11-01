@@ -74,8 +74,9 @@ export async function POST(req: NextRequest) {
           // Process each event from the graph
           for await (const event of eventStream) {
             const nodeName = Object.keys(event)[0];
-            const nodeData = event[nodeName];
-            const messages = nodeData.messages || [];
+            if (!nodeName) continue;
+            const nodeData = (event as Record<string, any>)[nodeName];
+            const messages = nodeData?.messages || [];
             const lastMessage = messages[messages.length - 1] as any;
             
             let type = "agent";

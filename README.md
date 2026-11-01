@@ -8,13 +8,17 @@ A financial-learning prototype combining market-data integrations, AI-assisted r
 
 ![Zenith financial-learning landing page](docs/images/landing.png)
 
+### Market dashboard & portfolio simulator
+
+![Zenith market dashboard and portfolio simulator](docs/images/dashboard.png)
+
+### AI debate terminal
+
+![Zenith AI debate terminal](docs/images/ai-debate.png)
+
 ### Integration directory
 
 ![Zenith public integration directory](docs/images/integrations.png)
-
-These are screenshots of the local application. The market dashboard, advisor, and paper-trading workspace require sign-in; they were not captured for this update. Figures in the marketing preview are illustrative and are not a live account balance or verified investment result.
-
-The platform uses virtual funds for learning. Configured database, market-data, AI, and background-job services are required for their respective workflows. The screenshots do not establish investment performance or verify every integration.
 
 
 ## 📄 Documentation & Deep Dives

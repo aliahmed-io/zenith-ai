@@ -3,6 +3,7 @@ import { connectToDatabase } from "../database/mongoose";
 async function main() {
   try {
     const mongoose = await connectToDatabase();
+    if (!mongoose) throw new Error('Could not connect to database');
     const db = mongoose.connection.db;
     if(!db) throw new Error('MongoDB connection not found');
     

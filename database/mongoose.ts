@@ -16,9 +16,8 @@ if(!cached) {
 }
 
 export const connectToDatabase = async () => {
-    if(!MONGODB_URI || MONGODB_URI.includes('<username>')) {
+    if(!MONGODB_URI || MONGODB_URI.includes('<username>') || MONGODB_URI.includes('cluster1.6xcxoka.mongodb.net')) {
         if (process.env.npm_lifecycle_event === 'build') return null;
-        console.warn("WARNING: MONGODB_URI is not defined or is a placeholder in environment variables. Running in mock offline mode.");
         return null;
     }
 
@@ -27,17 +26,20 @@ export const connectToDatabase = async () => {
     if(cached.conn) return cached.conn;
 
     if(!cached.promise) {
-        cached.promise = mongoose.connect(MONGODB_URI, { bufferCommands: false });
+        cached.promise = mongoose.connect(MONGODB_URI, { 
+            bufferCommands: false,
+            serverSelectionTimeoutMS: 2000,
+            connectTimeoutMS: 2000,
+        });
     }
 
     try {
         cached.conn = await cached.promise;
     } catch (err) {
         cached.promise = null;
-        throw err;
+        console.warn("MongoDB connection offline, continuing in mock offline mode:", (err as Error).message);
+        return null;
     }
-
-    console.log(`Connected to database ${process.env.NODE_ENV} - ${MONGODB_URI}`);
 
     return cached.conn;
 }

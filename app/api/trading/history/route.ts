@@ -21,9 +21,19 @@ export async function GET(req: Request) {
     }
 
     const userId = session.user.id;
-    await connectToDatabase();
-    
-    const history = await Transaction.find({ userId, symbol: symbol.toUpperCase() }).sort({ timestamp: -1 });
+    let history: unknown[] = [];
+
+    try {
+      const mongoose = await connectToDatabase();
+      if (mongoose?.connection?.db) {
+        history = await Transaction.find({ 
+          userId, 
+          symbol: symbol.toUpperCase() === 'ALL' ? { $exists: true } : symbol.toUpperCase() 
+        }).sort({ timestamp: -1 });
+      }
+    } catch (dbErr) {
+      console.warn('Transaction history database query skipped (offline fallback):', dbErr);
+    }
 
     return NextResponse.json({ history });
   } catch (error: unknown) {

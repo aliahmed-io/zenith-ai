@@ -22,10 +22,10 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import countryList from 'react-select-country-list';
 
-type CountrySelectProps = {
-    name: string;
+type CountrySelectProps<TFieldValues extends import('react-hook-form').FieldValues = any> = {
+    name: any;
     label: string;
-    control: Control<any>;
+    control: Control<TFieldValues, any>;
     error?: FieldError;
     required?: boolean;
 };
@@ -115,13 +115,13 @@ const CountrySelect = ({
     );
 };
 
-export const CountrySelectField = ({
+export const CountrySelectField = <TFieldValues extends import('react-hook-form').FieldValues = any>({
                                        name,
                                        label,
                                        control,
                                        error,
                                        required = false,
-                                   }: CountrySelectProps) => {
+                                   }: CountrySelectProps<TFieldValues>) => {
     return (
         <div className='space-y-2'>
             <Label htmlFor={name} className='form-label'>

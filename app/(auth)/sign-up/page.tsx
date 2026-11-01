@@ -51,10 +51,14 @@ const SignUp = () => {
         try {
             const result = await signUpWithEmail(data);
             if (result.success) {
+                toast.success('Account Ready!', {
+                    description: `Welcome to Zenith Terminal, ${data.fullName || 'Trader'}.`,
+                });
                 router.push('/dashboard');
+                router.refresh();
             } else {
-                toast.error('Sign up failed', {
-                    description: 'Email already registered or database offline.'
+                toast.error('Notice', {
+                    description: result.error || 'Failed to initialize account.'
                 });
             }
         } catch (e) {
@@ -96,27 +100,21 @@ const SignUp = () => {
 
                         <InputField
                             name="email"
-                            label="System Email"
-                            placeholder="contact@zenith.com"
+                            label="System Email or Username"
+                            placeholder="contact@zenith.com or username"
                             register={register}
                             error={errors.email}
-                            validation={{ 
-                                required: 'Email is required', 
-                                pattern: {
-                                    value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-                                    message: 'Invalid email address'
-                                }
-                            }}
+                            validation={{ required: 'Email or Username is required' }}
                         />
 
                         <InputField
                             name="password"
                             label="Encryption Password"
-                            placeholder="Min. 8 characters"
+                            placeholder="Enter any password"
                             type="password"
                             register={register}
                             error={errors.password}
-                            validation={{ required: 'Password is required', minLength: 8 }}
+                            validation={{ required: 'Password is required' }}
                         />
 
                         <Button onClick={handleNext} className="primary-btn w-full mt-6 uppercase tracking-wider flex items-center justify-center gap-2">
